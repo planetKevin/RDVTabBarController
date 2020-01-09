@@ -36,6 +36,7 @@
 }
 
 @property (nonatomic, readwrite) RDVTabBar *tabBar;
+@property (nonatomic, readwrite) CGFloat adjustedTabBarHeight;
 
 @end
 
@@ -62,19 +63,16 @@
     CGSize viewSize = self.view.bounds.size;
     CGFloat tabBarStartingY = viewSize.height;
     CGFloat contentViewHeight = viewSize.height;
-    CGFloat tabBarHeight = CGRectGetHeight([[self tabBar] frame]);
-
-    if (!tabBarHeight) {
+    CGFloat tabBarBaseHeight = CGRectGetHeight([[self tabBar] frame]) ? : 58.f;
+    
+    if (!self.adjustedTabBarHeight) {
+        CGFloat safeAreaBottom = 0.;
         if (@available(iOS 11.0, *)) {
-            CGFloat safeAreaBottom = UIApplication.sharedApplication.keyWindow.safeAreaInsets.bottom;
-            tabBarHeight = 58.f + safeAreaBottom / 1.5f;
-        } else {
-            tabBarHeight = 58.f;
+            safeAreaBottom = UIApplication.sharedApplication.keyWindow.safeAreaInsets.bottom;
         }
-    } else if (@available(iOS 11.0, *)) {
-        CGFloat safeAreaBottom = UIApplication.sharedApplication.keyWindow.safeAreaInsets.bottom;
-        tabBarHeight = 58.f + safeAreaBottom / 1.5f;
+        self.adjustedTabBarHeight = tabBarBaseHeight + safeAreaBottom / 1.5f;
     }
+    CGFloat tabBarHeight = self.adjustedTabBarHeight;
 
     if (!self.tabBarHidden) {
         tabBarStartingY = viewSize.height - tabBarHeight;
